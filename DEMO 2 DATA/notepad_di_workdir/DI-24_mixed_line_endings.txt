@@ -1,0 +1,3 @@
+line-one-crlf-marker-A1B2
+line-two-lf-marker-C3D4
+line-three-cr-marker-E5F6line-four-crlf-marker-G7H8
