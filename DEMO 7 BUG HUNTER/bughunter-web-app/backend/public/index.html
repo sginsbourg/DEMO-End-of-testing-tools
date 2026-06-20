@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BugHunter Web Command Portal</title>
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+    <div class="max-w-4xl mx-auto p-6">
+        <header class="mb-8 border-b border-slate-700 pb-4 flex items-center justify-between">
+            <h1 class="text-3xl font-extrabold tracking-tight text-emerald-400">🛡️ BugHunter Engine</h1>
+            <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-full border border-emerald-500/20 font-mono">V1.0.0 Online</span>
+        </header>
+
+        <main class="grid gap-6">
+            <!-- Scan Trigger Card -->
+            <section class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-slate-200">🚀 Initialize Adversarial Core Scan</h2>
+                <form id="scanForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Target Git Repository URL</label>
+                        <input type="url" id="repoUrl" required placeholder="https://github.com" 
+                            class="w-full bg-slate-950 border border-slate-600 rounded-lg px-4 py-3 text-slate-100 focus:outline-none focus:border-emerald-400 font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-400 mb-2">Target Branch</label>
+                        <input type="text" id="branch" placeholder="main" 
+                            class="w-full bg-slate-950 border border-slate-600 rounded-lg px-4 py-3 text-slate-100 focus:outline-none focus:border-emerald-400 font-mono text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 px-4 rounded-lg transition dynamic-btn cursor-pointer">
+                        Deploy Threat Hunters
+                    </button>
+                </form>
+            </section>
+
+            <!-- Results Panel -->
+            <section class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
+                <h3 class="text-lg font-bold mb-3 text-slate-200">📋 Pipeline Activity Status</h3>
+                <div id="statusConsole" class="bg-slate-950 rounded-lg p-4 font-mono text-xs text-slate-400 h-40 overflow-y-auto border border-slate-800 space-y-1">
+                    <div class="text-slate-500">// System idle. Awaiting configuration inputs...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('scanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const consoleBox = document.getElementById('statusConsole');
+            const repoUrl = document.getElementById('repoUrl').value;
+            const branch = document.getElementById('branch').value || 'main';
+
+            consoleBox.innerHTML += `<div class="text-emerald-400">[SYSTEM] Deploying validation payload for: ${repoUrl} [${branch}]</div>`;
+
+            try {
+                const response = await fetch('/api/start-scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ repositoryUrl: repoUrl, targetBranch: branch })
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    consoleBox.innerHTML += `<div class="text-cyan-400">🤖 [QUEUE SUCCESS] Job ID registered: ${data.jobId}</div>`;
+                    consoleBox.innerHTML += `<div class="text-slate-400">⚡ ${data.message} Background container threads executing.</div>`;
+                } else {
+                    consoleBox.innerHTML += `<div class="text-rose-400">❌ [API ERROR] ${data.error || 'Request aborted.'}</div>`;
+                }
+            } catch (err) {
+                consoleBox.innerHTML += `<div class="text-rose-500">❌ [NETWORK FAILURE] Cannot reach automation router api layer: ${err.message}</div>`;
+            }
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        });
+    </script>
+</body>
+</html>
